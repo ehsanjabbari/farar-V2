@@ -81,9 +81,15 @@ document.getElementById('btn-cancel-login').addEventListener('click', () => {
     document.getElementById('auth-screen').classList.add('hidden');
     document.getElementById('main-lobby').classList.remove('hidden');
 });
+
+// دکمه بازگشت به منو به همراه تاییدیه
 document.getElementById('btn-back-dashboard').addEventListener('click', () => {
-    location.reload(); 
+    const isConfirmed = confirm("آیا مطمئن هستید که می‌خواهید به منوی اصلی برگردید؟ (بازی فعلی متوقف خواهد شد)");
+    if (isConfirmed) {
+        location.reload(); 
+    }
 });
+
 document.getElementById('btn-offline-guest').addEventListener('click', () => startOfflineGame());
 document.getElementById('btn-offline-mode').addEventListener('click', () => startOfflineGame());
 
