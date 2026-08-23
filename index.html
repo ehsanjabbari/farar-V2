@@ -13,7 +13,7 @@
 </head>
 <body>
 
-    <!-- 1. صفحه لابی (قبل از ورود) -->
+    <!-- 1. صفحه لابی -->
     <div id="main-lobby" class="lobby-wrapper">
         <h1 class="game-title">فرار از دیوار</h1>
         <div class="lobby-card">
@@ -39,7 +39,7 @@
         </div>
     </div>
 
-    <!-- 3. داشبورد کاربری (پس از ورود) -->
+    <!-- 3. داشبورد کاربری -->
     <div id="dashboard-screen" class="lobby-wrapper hidden">
         <h1 class="game-title">فرار از دیوار</h1>
         
@@ -52,7 +52,6 @@
         </div>
 
         <div class="lobby-card">
-            <!-- بخش افزودن دوست -->
             <div class="add-friend-box">
                 <input type="text" id="input-friend-name" placeholder="نام کاربری دوست..." autocomplete="off">
                 <button id="btn-add-friend" class="btn primary-btn btn-small">افزودن</button>
@@ -60,13 +59,15 @@
             
             <div class="divider"><span>لیست دوستان</span></div>
             
-            <!-- کادر لیست دوستان -->
             <div id="friends-list" class="friends-container">
                 <p style="text-align:center; color:#6c757d; font-size:12px;">در حال بارگذاری...</p>
             </div>
 
             <div class="divider"><span>یا</span></div>
             <button id="btn-offline-mode" class="btn outline-btn">بازی آفلاین روی این گوشی</button>
+            
+            <!-- دکمه جدید خروج از حساب -->
+            <button id="btn-logout" class="btn outline-btn" style="margin-top: 5px; color: #e63946; border-color: #ffd0d5; background-color: #fff5f6;">خروج از حساب</button>
         </div>
         <div class="creator-signature">Created by EhsanJabbari</div>
     </div>

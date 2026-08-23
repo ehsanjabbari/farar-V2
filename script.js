@@ -38,10 +38,32 @@ const withTimeout = (promise, ms = 5000) => {
 };
 
 // =========================================
-// قفل کردن اسکرول مزاحم در مرورگر موبایل
+// سیستم ورود خودکار با LocalStorage
+// =========================================
+document.addEventListener('DOMContentLoaded', async () => {
+    const savedData = localStorage.getItem('wallrush_user');
+    if (savedData) {
+        document.getElementById('btn-show-login').innerText = 'در حال ورود خودکار...';
+        try {
+            const { username, password } = JSON.parse(savedData);
+            const snap = await get(ref(db, `users/${username}`));
+            if (snap.exists() && snap.val().password === password) {
+                loggedInUser = { username, ...snap.val() };
+                processLoginSuccess();
+            } else {
+                localStorage.removeItem('wallrush_user');
+                document.getElementById('btn-show-login').innerText = '👤 ورود یا ساخت حساب';
+            }
+        } catch (e) {
+            document.getElementById('btn-show-login').innerText = '👤 ورود یا ساخت حساب';
+        }
+    }
+});
+
+// =========================================
+// قفل کردن اسکرول مزاحم
 // =========================================
 document.addEventListener('touchmove', function(e) {
-    // اگر در صفحه بازی هستیم یا کاربر جای غیر از لیست دوستان را می‌کشد، اسکرول قفل شود
     if (!document.getElementById('game-screen').classList.contains('hidden') || 
         !e.target.closest('#friends-list')) {
         e.preventDefault();
@@ -49,7 +71,7 @@ document.addEventListener('touchmove', function(e) {
 }, { passive: false });
 
 // =========================================
-// جابجایی صفحات
+// جابجایی صفحات و خروج
 // =========================================
 document.getElementById('btn-show-login').addEventListener('click', () => {
     document.getElementById('main-lobby').classList.add('hidden');
@@ -64,6 +86,12 @@ document.getElementById('btn-back-dashboard').addEventListener('click', () => {
 });
 document.getElementById('btn-offline-guest').addEventListener('click', () => startOfflineGame());
 document.getElementById('btn-offline-mode').addEventListener('click', () => startOfflineGame());
+
+// سیستم خروج از حساب
+document.getElementById('btn-logout').addEventListener('click', () => {
+    localStorage.removeItem('wallrush_user');
+    location.reload(); 
+});
 
 // =========================================
 // ورود / ثبت‌نام
@@ -87,6 +115,8 @@ document.getElementById('btn-login').addEventListener('click', async () => {
             const userData = snapshot.val();
             if (userData.password === password) {
                 loggedInUser = { username, ...userData };
+                // ذخیره اطلاعات برای ورود خودکار بعدی
+                localStorage.setItem('wallrush_user', JSON.stringify({ username, password }));
                 processLoginSuccess();
             } else {
                 alert("رمز اشتباه است!");
@@ -95,6 +125,8 @@ document.getElementById('btn-login').addEventListener('click', async () => {
             const newUser = { password, wins: 0, losses: 0 };
             await set(userRef, newUser);
             loggedInUser = { username, ...newUser };
+            // ذخیره اطلاعات برای ورود خودکار بعدی
+            localStorage.setItem('wallrush_user', JSON.stringify({ username, password }));
             alert("حساب ساخته شد!");
             processLoginSuccess();
         }
