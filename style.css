@@ -2,15 +2,14 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* تنظیم ارتفاع دقیق برای موبایل و قفل کردن اسکرول */
     min-height: 100vh;
     height: 100dvh; 
     overflow: hidden; 
-    overscroll-behavior: none; /* جلوگیری از رفرش شدن صفحه با کشیدن به پایین */
+    overscroll-behavior: none; 
     background-color: #f8f9fa; 
     font-family: 'Segoe UI', Tahoma, sans-serif; 
     margin: 0;
-    padding: 15px;
+    padding: 10px; /* کاهش پدینگ کلی صفحه */
     box-sizing: border-box;
 }
 
@@ -18,13 +17,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 12px; /* کاهش فاصله بین کارت‌ها */
     width: 100%;
     max-width: 350px;
 }
 
 .game-title {
-    font-size: 32px;
+    font-size: 24px; /* کوچکتر شدن تایتل بازی */
     color: #1d3557;
     margin: 0;
     text-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -32,119 +31,131 @@ body {
 
 .lobby-card {
     background: #ffffff;
-    padding: 25px 20px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    padding: 15px; /* کاهش پدینگ کارت لابی */
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px; /* کاهش فاصله بین دکمه‌ها */
     box-sizing: border-box;
 }
 
 .profile-card {
     background: linear-gradient(135deg, #1d3557, #2a4c7a);
     color: white;
-    padding: 15px 20px;
-    border-radius: 16px;
+    padding: 12px 15px;
+    border-radius: 14px;
     width: 100%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 4px 15px rgba(29, 53, 87, 0.2);
+    gap: 6px;
+    box-shadow: 0 4px 10px rgba(29, 53, 87, 0.2);
 }
-.profile-name { font-size: 18px; font-weight: bold; letter-spacing: 0.5px; }
-.profile-stats { display: flex; gap: 20px; font-size: 13px; background: rgba(255,255,255,0.15); padding: 6px 12px; border-radius: 10px;}
+.profile-name { font-size: 15px; font-weight: bold; letter-spacing: 0.5px; }
+.profile-stats { display: flex; gap: 15px; font-size: 11px; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 8px;}
 .stat-win { color: #ffd166; }
 .stat-loss { color: #ff99a8; }
 
-.auth-hint { font-size: 11px; color: #6c757d; text-align: center; line-height: 1.6; margin: 0; }
+.auth-hint { font-size: 10px; color: #6c757d; text-align: center; line-height: 1.4; margin: 0; }
 
-.divider { text-align: center; position: relative; margin: 5px 0; }
+.divider { text-align: center; position: relative; margin: 2px 0; }
 .divider::before { content: ""; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #e9ecef; z-index: 1; }
-.divider span { background: #fff; padding: 0 15px; color: #adb5bd; font-size: 14px; position: relative; z-index: 2; }
+.divider span { background: #fff; padding: 0 10px; color: #adb5bd; font-size: 12px; position: relative; z-index: 2; }
 
 /* استایل‌های لیست دوستان */
-.add-friend-box { display: flex; gap: 10px; }
-.add-friend-box input { flex: 1; padding: 10px; font-size: 13px; }
+.add-friend-box { display: flex; gap: 8px; }
+.add-friend-box input { flex: 1; padding: 8px; font-size: 12px; }
 
 .friends-container {
-    max-height: 180px;
+    max-height: 120px; /* ارتفاع کمتر برای لیست دوستان */
     overflow-y: auto;
     border: 2px solid #f1f3f5;
-    border-radius: 12px;
-    padding: 5px 10px;
+    border-radius: 10px;
+    padding: 4px 8px;
     background: #fafbfc;
-    /* اجازه اسکرول فقط در لیست دوستان */
     touch-action: pan-y;
 }
 .friend-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 5px;
+    padding: 6px 4px;
     border-bottom: 1px solid #e9ecef;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
     color: #495057;
 }
 .friend-item:last-child { border-bottom: none; }
 
 .btn {
-    padding: 14px; border: none; border-radius: 12px; font-size: 15px;
-    font-weight: bold; cursor: pointer; transition: all 0.2s; width: 100%;
+    padding: 10px; /* باریک‌تر شدن دکمه‌ها */
+    border: none; 
+    border-radius: 10px; 
+    font-size: 13px;
+    font-weight: bold; 
+    cursor: pointer; 
+    transition: all 0.2s; 
+    width: 100%;
 }
-.btn-small { padding: 8px 12px; font-size: 12px; width: auto; border-radius: 8px; }
+.btn-small { padding: 6px 10px; font-size: 11px; width: auto; border-radius: 6px; }
 
-.primary-btn { background-color: #1d3557; color: white; box-shadow: 0 4px 15px rgba(29, 53, 87, 0.2); }
+.primary-btn { background-color: #1d3557; color: white; box-shadow: 0 4px 10px rgba(29, 53, 87, 0.2); }
 .primary-btn:hover { background-color: #14243b; transform: translateY(-2px); }
 
-.secondary-btn { background-color: #e63946; color: white; box-shadow: 0 4px 15px rgba(230, 57, 70, 0.2); }
+.secondary-btn { background-color: #e63946; color: white; box-shadow: 0 4px 10px rgba(230, 57, 70, 0.2); }
 .secondary-btn:hover { background-color: #c92a36; transform: translateY(-2px); }
 
-.success-btn { background-color: #2a9d8f; color: white; box-shadow: 0 4px 15px rgba(42, 157, 143, 0.2); }
+.success-btn { background-color: #2a9d8f; color: white; box-shadow: 0 4px 10px rgba(42, 157, 143, 0.2); }
 .success-btn:hover { background-color: #21867a; transform: translateY(-2px); }
 
 .outline-btn { background-color: transparent; color: #495057; border: 2px solid #ced4da; }
 .outline-btn:hover { background-color: #f8f9fa; transform: translateY(-2px); }
 
 input[type="text"], input[type="password"] {
-    padding: 14px; border: 2px solid #e9ecef; border-radius: 12px;
-    font-size: 15px; text-align: center; outline: none; transition: border-color 0.2s; font-family: inherit;
+    padding: 10px; /* باریک‌تر شدن اینپوت‌ها */
+    border: 2px solid #e9ecef; 
+    border-radius: 10px;
+    font-size: 13px; 
+    text-align: center; 
+    outline: none; 
+    transition: border-color 0.2s; 
+    font-family: inherit;
 }
 input:focus { border-color: #1d3557; }
 
 .room-info {
     width: 100%; display: flex; justify-content: space-between; align-items: center;
-    background: #f1f3f5; padding: 10px 15px; border-radius: 12px; font-size: 13px; font-weight: bold; color: #495057; box-sizing: border-box;
+    background: #f1f3f5; padding: 6px 10px; border-radius: 10px; font-size: 12px; font-weight: bold; color: #495057; box-sizing: border-box;
 }
-.highlight-code { color: #e63946; letter-spacing: 1px; font-size: 15px; }
+.highlight-code { color: #e63946; letter-spacing: 1px; font-size: 13px; }
 
-.role-badge { background: #1d3557; color: white; padding: 4px 10px; border-radius: 8px; font-size: 12px; }
+.role-badge { background: #1d3557; color: white; padding: 3px 8px; border-radius: 6px; font-size: 11px; }
 .role-badge.red-role { background: #e63946; }
 
+/* فشردگی محیط اصلی بازی */
 .game-wrapper { 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    gap: 15px; 
+    gap: 8px; /* کاهش شدید فاصله‌ها در حین بازی */
     width: 100%; 
     max-width: 400px; 
-    touch-action: none; /* قفل کردن کامل لمس و اسکرول در محیط بازی */
+    touch-action: none; 
 }
 
-.scoreboard { display: flex; justify-content: space-between; width: 100%; font-weight: bold; font-size: 14px; padding: 0 5px; box-sizing: border-box; gap: 10px; }
-.player { padding: 10px; border-radius: 14px; color: #ffffff; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: opacity 0.3s; width: 48%; box-sizing: border-box; }
+.scoreboard { display: flex; justify-content: space-between; width: 100%; font-weight: bold; font-size: 13px; padding: 0 5px; box-sizing: border-box; gap: 8px; }
+.player { padding: 6px; border-radius: 12px; color: #ffffff; display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: opacity 0.3s; width: 48%; box-sizing: border-box; }
 .red-player { background-color: #e63946; }
 .blue-player { background-color: #1d3557; }
 
-.player-name { font-size: 14px; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.player-stats { display: flex; justify-content: center; gap: 12px; font-size: 12px; background: rgba(255, 255, 255, 0.2); padding: 6px 10px; border-radius: 8px; width: 100%; box-sizing: border-box; }
+.player-name { font-size: 12px; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.player-stats { display: flex; justify-content: center; gap: 8px; font-size: 11px; background: rgba(255, 255, 255, 0.2); padding: 4px 6px; border-radius: 6px; width: 100%; box-sizing: border-box; }
 
-.dispensers { display: flex; gap: 15px; width: 100%; justify-content: center; }
-.draggable-wall { background-color: #ffffff; border: 2px solid #e9ecef; color: #495057; padding: 8px 24px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: grab; user-select: none; touch-action: none; transition: all 0.2s; }
+.dispensers { display: flex; gap: 10px; width: 100%; justify-content: center; }
+.draggable-wall { background-color: #ffffff; border: 2px solid #e9ecef; color: #495057; padding: 6px 16px; border-radius: 15px; font-size: 12px; font-weight: bold; cursor: grab; user-select: none; touch-action: none; transition: all 0.2s; }
 .draggable-wall:active { cursor: grabbing; background-color: #e9ecef; }
 
 .ghost-wall { position: fixed; pointer-events: none; z-index: 1000; border-radius: 4px; transform: translate(-50%, -50%); }
@@ -153,7 +164,7 @@ input:focus { border-color: #1d3557; }
 .ghost-wall.h { width: 80px; height: 8px; }
 .ghost-wall.v { width: 8px; height: 80px; }
 
-.board { display: grid; width: 100%; aspect-ratio: 1 / 1; grid-template-columns: 1fr repeat(8, 8px 1fr); grid-template-rows: 1fr repeat(8, 8px 1fr); background-color: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05); box-sizing: border-box; touch-action: none; }
+.board { display: grid; width: 100%; aspect-ratio: 1 / 1; grid-template-columns: 1fr repeat(8, 8px 1fr); grid-template-rows: 1fr repeat(8, 8px 1fr); background-color: #ffffff; padding: 8px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); box-sizing: border-box; touch-action: none; }
 .cell { background-color: #f8f9fa; border-radius: 4px; position: relative; cursor: pointer; }
 .wall-v, .wall-h, .cross { background-color: #f1f3f5; transition: background-color 0.3s; }
 .placed-wall { cursor: not-allowed; }
@@ -164,7 +175,7 @@ input:focus { border-color: #1d3557; }
 .pawn.red { background-color: #e63946; }
 .pawn.blue { background-color: #1d3557; }
 
-.turn-indicator { margin-top: 10px; font-size: 16px; font-weight: bold; padding: 10px 20px; border-radius: 8px; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: color 0.3s, background-color 0.3s; }
+.turn-indicator { margin-top: 5px; font-size: 13px; font-weight: bold; padding: 6px 15px; border-radius: 6px; background-color: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: color 0.3s, background-color 0.3s; }
 .turn-indicator.blue-turn { color: #1d3557; border-bottom: 3px solid #1d3557; }
 .turn-indicator.red-turn { color: #e63946; border-bottom: 3px solid #e63946; }
 
@@ -175,7 +186,7 @@ input:focus { border-color: #1d3557; }
 .move-hint.red { background-color: #e63946; }
 .move-hint.blue { background-color: #1d3557; }
 
-.restart-btn { padding: 12px 24px; font-size: 15px; font-weight: bold; color: #ffffff; background-color: #e63946; border: none; border-radius: 20px; cursor: pointer; transition: background-color 0.3s, transform 0.2s; box-shadow: 0 4px 12px rgba(230, 57, 70, 0.2); }
+.restart-btn { padding: 8px 16px; font-size: 13px; font-weight: bold; color: #ffffff; background-color: #e63946; border: none; border-radius: 12px; cursor: pointer; transition: background-color 0.3s, transform 0.2s; box-shadow: 0 4px 10px rgba(230, 57, 70, 0.2); }
 .restart-btn:hover { background-color: #d62828; transform: translateY(-2px); }
 .hidden { display: none !important; }
-.creator-signature { font-size: 11px; color: #adb5bd; letter-spacing: 1px; text-transform: uppercase; }
+.creator-signature { font-size: 9px; color: #adb5bd; letter-spacing: 1px; text-transform: uppercase; margin-top: 5px; }
