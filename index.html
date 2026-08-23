@@ -13,36 +13,18 @@
 </head>
 <body>
 
-    <!-- 1. صفحه لابی (صفحه اصلی) -->
-    <div id="lobby-screen" class="lobby-wrapper">
+    <!-- 1. صفحه لابی (قبل از ورود) -->
+    <div id="main-lobby" class="lobby-wrapper">
         <h1 class="game-title">فرار از دیوار</h1>
-        
-        <!-- کارت پروفایل (در ابتدا مخفی است) -->
-        <div id="profile-section" class="profile-card hidden">
-            <div id="profile-name" class="profile-name">سلام، کاربر</div>
-            <div class="profile-stats">
-                <span class="stat-win">🏆 کل بردها: <b id="profile-wins">0</b></span>
-                <span class="stat-loss">💔 کل باخت‌ها: <b id="profile-losses">0</b></span>
-            </div>
-        </div>
-
         <div class="lobby-card">
-            <!-- دکمه ورود به حساب کاربری -->
             <button id="btn-show-login" class="btn success-btn">👤 ورود یا ساخت حساب</button>
-            <div id="login-divider" class="divider"><span>سپس</span></div>
-
-            <button id="btn-create-room" class="btn primary-btn">ساخت اتاق جدید</button>
             <div class="divider"><span>یا</span></div>
-            <input type="text" id="input-room-code" placeholder="کد 4 رقمی اتاق را وارد کنید..." autocomplete="off">
-            <button id="btn-join-room" class="btn secondary-btn">ورود به اتاق</button>
-            <div class="divider"><span>یا</span></div>
-            <button id="btn-offline-mode" class="btn outline-btn">بازی آفلاین (روی یک گوشی)</button>
+            <button id="btn-offline-guest" class="btn outline-btn">بازی آفلاین (مهمان)</button>
         </div>
-        
         <div class="creator-signature">Created by EhsanJabbari</div>
     </div>
 
-    <!-- 2. صفحه ورود / ثبت نام (در ابتدا مخفی است) -->
+    <!-- 2. صفحه ورود / ثبت نام -->
     <div id="auth-screen" class="lobby-wrapper hidden">
         <h1 class="game-title">فرار از دیوار</h1>
         <div class="lobby-card">
@@ -51,18 +33,49 @@
             <input type="password" id="input-password" placeholder="رمز عبور (حداقل 4 کاراکتر)" autocomplete="off">
             
             <button id="btn-login" class="btn primary-btn">تایید و ورود</button>
-            <button id="btn-cancel-login" class="btn outline-btn">بازگشت به لابی</button>
+            <button id="btn-cancel-login" class="btn outline-btn">بازگشت</button>
             
-            <p class="auth-hint">اگر حسابی با این نام وجود نداشته باشد، به صورت خودکار برای شما ساخته می‌شود.</p>
+            <p class="auth-hint">اگر حسابی با این نام وجود نداشته باشد، به صورت خودکار ساخته می‌شود.</p>
+        </div>
+    </div>
+
+    <!-- 3. داشبورد کاربری (پس از ورود) -->
+    <div id="dashboard-screen" class="lobby-wrapper hidden">
+        <h1 class="game-title">فرار از دیوار</h1>
+        
+        <div class="profile-card">
+            <div id="profile-name" class="profile-name">سلام، کاربر</div>
+            <div class="profile-stats">
+                <span class="stat-win">🏆 کل بردها: <b id="profile-wins">0</b></span>
+                <span class="stat-loss">💔 کل باخت‌ها: <b id="profile-losses">0</b></span>
+            </div>
+        </div>
+
+        <div class="lobby-card">
+            <!-- بخش افزودن دوست -->
+            <div class="add-friend-box">
+                <input type="text" id="input-friend-name" placeholder="نام کاربری دوست..." autocomplete="off">
+                <button id="btn-add-friend" class="btn primary-btn btn-small">افزودن</button>
+            </div>
+            
+            <div class="divider"><span>لیست دوستان</span></div>
+            
+            <!-- کادر لیست دوستان -->
+            <div id="friends-list" class="friends-container">
+                <p style="text-align:center; color:#6c757d; font-size:12px;">در حال بارگذاری...</p>
+            </div>
+
+            <div class="divider"><span>یا</span></div>
+            <button id="btn-offline-mode" class="btn outline-btn">بازی آفلاین روی این گوشی</button>
         </div>
         <div class="creator-signature">Created by EhsanJabbari</div>
     </div>
 
-    <!-- 3. صفحه اصلی بازی (در ابتدا مخفی است) -->
+    <!-- 4. صفحه اصلی بازی -->
     <div id="game-screen" class="game-wrapper hidden">
         
         <div class="room-info">
-            کد اتاق: <span id="display-room-code" class="highlight-code">----</span>
+            بازی با: <span id="display-opponent-name" class="highlight-code">----</span>
             <div id="my-role-display" class="role-badge">شما: در حال اتصال...</div>
         </div>
 
@@ -93,6 +106,7 @@
         <div id="turn-indicator" class="turn-indicator blue-turn">PLAYER 1</div>
         
         <button id="restart-btn" class="restart-btn hidden">شروع دست جدید</button>
+        <button id="btn-back-dashboard" class="btn outline-btn" style="margin-top: 10px;">بازگشت به منو</button>
         <div class="creator-signature">Created by EhsanJabbari</div>
     </div>
 

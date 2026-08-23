@@ -38,33 +38,35 @@ const withTimeout = (promise, ms = 5000) => {
 };
 
 // =========================================
-// کنترل جابجایی بین صفحات (لابی و ورود)
+// جابجایی صفحات
 // =========================================
 document.getElementById('btn-show-login').addEventListener('click', () => {
-    document.getElementById('lobby-screen').classList.add('hidden');
+    document.getElementById('main-lobby').classList.add('hidden');
     document.getElementById('auth-screen').classList.remove('hidden');
 });
-
 document.getElementById('btn-cancel-login').addEventListener('click', () => {
     document.getElementById('auth-screen').classList.add('hidden');
-    document.getElementById('lobby-screen').classList.remove('hidden');
+    document.getElementById('main-lobby').classList.remove('hidden');
 });
+document.getElementById('btn-back-dashboard').addEventListener('click', () => {
+    location.reload(); // ساده‌ترین راه برای بازگشت و ریست بازی
+});
+document.getElementById('btn-offline-guest').addEventListener('click', () => startOfflineGame());
+document.getElementById('btn-offline-mode').addEventListener('click', () => startOfflineGame());
 
 // =========================================
-// سیستم ثبت نام و ورود (Authentication)
+// ورود / ثبت‌نام
 // =========================================
 document.getElementById('btn-login').addEventListener('click', async () => {
     const username = document.getElementById('input-username').value.trim();
     const password = document.getElementById('input-password').value.trim();
 
     if (username.length < 3 || password.length < 4) {
-        alert("نام کاربری حداقل ۳ حرف و رمز عبور حداقل ۴ حرف باشد.");
-        return;
+        alert("نام کاربری حداقل ۳ و رمز حداقل ۴ حرف باشد."); return;
     }
 
     const btn = document.getElementById('btn-login');
-    btn.innerText = 'در حال بررسی...';
-    btn.disabled = true;
+    btn.innerText = 'در حال بررسی...'; btn.disabled = true;
 
     try {
         const userRef = ref(db, `users/${username}`);
@@ -76,34 +78,33 @@ document.getElementById('btn-login').addEventListener('click', async () => {
                 loggedInUser = { username, ...userData };
                 processLoginSuccess();
             } else {
-                alert("رمز عبور برای این نام کاربری اشتباه است!");
+                alert("رمز اشتباه است!");
             }
         } else {
             const newUser = { password, wins: 0, losses: 0 };
             await set(userRef, newUser);
             loggedInUser = { username, ...newUser };
-            alert("حساب جدید شما با موفقیت ساخته شد!");
+            alert("حساب ساخته شد!");
             processLoginSuccess();
         }
     } catch (e) {
-        alert("ارتباط با سرور برقرار نشد. لطفاً VPN خود را بررسی کنید.");
+        alert("ارتباط با سرور برقرار نشد (VPN را بررسی کنید).");
     } finally {
-        btn.innerText = 'تایید و ورود';
-        btn.disabled = false;
+        btn.innerText = 'تایید و ورود'; btn.disabled = false;
     }
 });
 
 function processLoginSuccess() {
-    // بازگشت به لابی
     document.getElementById('auth-screen').classList.add('hidden');
-    document.getElementById('lobby-screen').classList.remove('hidden');
-    
-    // مخفی کردن دکمه ورود و نمایش کارت پروفایل
-    document.getElementById('btn-show-login').classList.add('hidden');
-    document.getElementById('login-divider').classList.add('hidden');
-    document.getElementById('profile-section').classList.remove('hidden');
-    
+    document.getElementById('main-lobby').classList.add('hidden');
+    document.getElementById('dashboard-screen').classList.remove('hidden');
     updateProfileUI();
+
+    // گوش دادن به تغییرات لیست دوستان
+    const friendsRef = ref(db, `users/${loggedInUser.username}/friends`);
+    onValue(friendsRef, (snapshot) => {
+        renderFriendsList(snapshot.val());
+    });
 }
 
 function updateProfileUI() {
@@ -113,87 +114,105 @@ function updateProfileUI() {
 }
 
 // =========================================
-// سیستم لابی اتاق‌ها
+// سیستم افزودن دوست
 // =========================================
-document.getElementById('btn-create-room').addEventListener('click', async () => {
-    if (!loggedInUser) {
-        alert("برای بازی آنلاین ابتدا باید وارد حساب کاربری شوید!");
-        return;
-    }
+document.getElementById('btn-add-friend').addEventListener('click', async () => {
+    const friendName = document.getElementById('input-friend-name').value.trim();
+    if (!friendName) return;
+    if (friendName === loggedInUser.username) { alert("نمی‌توانید خودتان را اضافه کنید!"); return; }
 
-    const btn = document.getElementById('btn-create-room');
-    btn.innerText = 'در حال ساخت...';
-    btn.disabled = true;
+    const btn = document.getElementById('btn-add-friend');
+    btn.innerText = '...'; btn.disabled = true;
 
     try {
-        gameMode = 'online';
-        currentRoomId = Math.floor(1000 + Math.random() * 9000).toString(); 
+        const snap = await withTimeout(get(ref(db, `users/${friendName}`)));
+        if (snap.exists()) {
+            // دوستی دوطرفه
+            await set(ref(db, `users/${loggedInUser.username}/friends/${friendName}`), true);
+            await set(ref(db, `users/${friendName}/friends/${loggedInUser.username}`), true);
+            document.getElementById('input-friend-name').value = '';
+            alert('دوست شما با موفقیت اضافه شد!');
+        } else {
+            alert('کاربری با این نام یافت نشد!');
+        }
+    } catch(e) {
+        alert("خطا در ارتباط با سرور.");
+    } finally {
+        btn.innerText = 'افزودن'; btn.disabled = false;
+    }
+});
+
+function renderFriendsList(friendsObj) {
+    const list = document.getElementById('friends-list');
+    list.innerHTML = '';
+    if (!friendsObj) {
+        list.innerHTML = '<p style="text-align:center; color:#6c757d; font-size:12px; padding:10px;">هنوز دوستی اضافه نکرده‌اید.</p>';
+        return;
+    }
+    
+    Object.keys(friendsObj).forEach(friendName => {
+        const div = document.createElement('div');
+        div.className = 'friend-item';
+        
+        const span = document.createElement('span');
+        span.innerText = friendName;
+        
+        const btn = document.createElement('button');
+        btn.className = 'btn success-btn btn-small';
+        btn.innerText = 'شروع بازی';
+        // با زدن دکمه مستقیما با او بازی میکنیم
+        btn.onclick = () => startGameWithFriend(friendName);
+        
+        div.appendChild(span);
+        div.appendChild(btn);
+        list.appendChild(div);
+    });
+}
+
+// =========================================
+// شروع بازی مستقیم با یک دوست
+// =========================================
+async function startGameWithFriend(friendName) {
+    gameMode = 'online';
+    // ساخت آیدی اتاق یکتا و مشترک بر اساس نام دو نفر به ترتیب حروف الفبا
+    currentRoomId = [loggedInUser.username, friendName].sort().join('_');
+    statsUpdated = false;
+
+    const roomRef = ref(db, `rooms/${currentRoomId}/gameState`);
+    const snapshot = await withTimeout(get(roomRef)).catch(() => null);
+
+    if (snapshot && snapshot.exists()) {
+        const state = snapshot.val();
+        // اگر اتاق قبلا ساخته شده، تعیین نقش بر اساس نام ثبت شده در دیتابیس
+        if (state.player1Name === loggedInUser.username) {
+            myRole = 'blue';
+            player1Name = state.player1Name;
+            player2Name = state.player2Name;
+        } else {
+            myRole = 'red';
+            player1Name = state.player1Name;
+            player2Name = state.player2Name;
+        }
+    } else {
+        // اگر اتاق وجود ندارد، ما آن را می‌سازیم و نفر اول میشویم
         myRole = 'blue';
         player1Name = loggedInUser.username;
-        player2Name = 'در حال انتظار...';
-        statsUpdated = false;
-        
+        player2Name = friendName;
         const initialState = {
-            player1Name: player1Name,
-            player2Name: player2Name,
-            currentPlayer: 'blue',
-            startingPlayer: 'blue',
+            player1Name, player2Name,
+            currentPlayer: 'blue', startingPlayer: 'blue',
             isGameOver: false,
             positions: { red: { r: 0, c: 8 }, blue: { r: 16, c: 8 } },
             walls: { red: 10, blue: 10 },
-            placedWalls: [],
-            scores: { red: 0, blue: 0 }
+            placedWalls: [], scores: { red: 0, blue: 0 }
         };
-
-        await withTimeout(set(ref(db, `rooms/${currentRoomId}`), { gameState: initialState }));
-        
-        setupGameScreen();
-        alert(`اتاق ساخته شد! \nکد اتاق شما: ${currentRoomId}\nمنتظر ورود حریف بمانید...`);
-    } catch (e) {
-        alert("خطا در ارتباط با سرور. VPN را بررسی کنید.");
-    } finally {
-        btn.innerText = 'ساخت اتاق جدید';
-        btn.disabled = false;
-    }
-});
-
-document.getElementById('btn-join-room').addEventListener('click', async () => {
-    if (!loggedInUser) {
-        alert("برای بازی آنلاین ابتدا باید وارد حساب کاربری شوید!");
-        return;
+        await set(ref(db, `rooms/${currentRoomId}`), { gameState: initialState });
     }
 
-    const code = document.getElementById('input-room-code').value.trim().toUpperCase();
-    if (!code) return;
+    setupGameScreen(friendName);
+}
 
-    const btn = document.getElementById('btn-join-room');
-    btn.innerText = 'در حال جستجو...';
-    btn.disabled = true;
-
-    try {
-        gameMode = 'online';
-        const roomRef = ref(db, `rooms/${code}/gameState`);
-        const snapshot = await withTimeout(get(roomRef));
-
-        if (snapshot.exists()) {
-            currentRoomId = code;
-            myRole = 'red'; 
-            statsUpdated = false;
-            
-            await set(ref(db, `rooms/${code}/gameState/player2Name`), loggedInUser.username);
-            setupGameScreen();
-        } else {
-            alert("اتاقی با این کد یافت نشد!");
-        }
-    } catch (e) {
-        alert("خطا در ارتباط با سرور. VPN را بررسی کنید.");
-    } finally {
-        btn.innerText = 'ورود به اتاق';
-        btn.disabled = false;
-    }
-});
-
-document.getElementById('btn-offline-mode').addEventListener('click', () => {
+function startOfflineGame() {
     gameMode = 'offline';
     myRole = 'both'; 
     currentRoomId = null;
@@ -201,30 +220,27 @@ document.getElementById('btn-offline-mode').addEventListener('click', () => {
     player2Name = 'مهمان ۲';
     statsUpdated = true; 
 
-    startingPlayer = 'blue';
-    currentPlayer = 'blue';
-    isGameOver = false;
+    startingPlayer = 'blue'; currentPlayer = 'blue'; isGameOver = false;
     positions = { red: { r: 0, c: 8 }, blue: { r: 16, c: 8 } };
     walls = { red: 10, blue: 10 };
     scores = { red: 0, blue: 0 }; 
 
-    setupGameScreen();
-});
+    setupGameScreen('آفلاین');
+}
 
-function setupGameScreen() {
-    document.getElementById('lobby-screen').classList.add('hidden');
+function setupGameScreen(opponentDisplay) {
+    document.getElementById('main-lobby').classList.add('hidden');
+    document.getElementById('dashboard-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
     
     const roleBadge = document.getElementById('my-role-display');
+    document.getElementById('display-opponent-name').innerText = opponentDisplay;
 
     if (gameMode === 'offline') {
-        document.getElementById('display-room-code').innerText = 'آفلاین';
-        roleBadge.innerText = 'بازی دو نفره روی یک گوشی';
-        createBoard();
-        updateDisplay();
+        roleBadge.innerText = 'بازی دو نفره محلی';
+        createBoard(); updateDisplay();
     } else {
-        document.getElementById('display-room-code').innerText = currentRoomId;
-        roleBadge.innerText = myRole === 'blue' ? 'شما: PLAYER 1 (آبی)' : 'شما: PLAYER 2 (قرمز)';
+        roleBadge.innerText = myRole === 'blue' ? 'شما: مهره آبی' : 'شما: مهره قرمز';
         roleBadge.className = myRole === 'red' ? 'role-badge red-role' : 'role-badge';
         
         createBoard();
@@ -237,12 +253,11 @@ function setupGameScreen() {
 }
 
 // =========================================
-// آپدیت پروفایل در دیتابیس هنگام پایان بازی
+// آپدیت پروفایل
 // =========================================
 function processGameOver(winnerRole) {
     if (gameMode === 'online' && !statsUpdated && loggedInUser) {
         statsUpdated = true; 
-        
         if (myRole === winnerRole) {
             loggedInUser.wins++;
             set(ref(db, `users/${loggedInUser.username}/wins`), loggedInUser.wins);
@@ -250,13 +265,12 @@ function processGameOver(winnerRole) {
             loggedInUser.losses++;
             set(ref(db, `users/${loggedInUser.username}/losses`), loggedInUser.losses);
         }
-        
         updateProfileUI(); 
     }
 }
 
 // =========================================
-// هسته بازی و همگام‌سازی (Sync)
+// هسته بازی
 // =========================================
 function applyGameStateFromFirebase(state) {
     currentPlayer = state.currentPlayer;
@@ -299,52 +313,33 @@ function applyGameStateFromFirebase(state) {
 
 function syncGameStateToFirebase() {
     if (!currentRoomId || gameMode === 'offline') return;
-
     let placedWallsData = [];
     document.querySelectorAll('.placed-wall').forEach(el => {
         placedWallsData.push({ r: el.dataset.row, c: el.dataset.col, color: el.classList.contains('red-wall') ? 'red' : 'blue' });
     });
-
     const newState = {
-        player1Name, player2Name,
-        currentPlayer, startingPlayer, isGameOver,
-        positions, walls,
-        placedWalls: placedWallsData,
-        scores
+        player1Name, player2Name, currentPlayer, startingPlayer, isGameOver,
+        positions, walls, placedWalls: placedWallsData, scores
     };
-
     set(ref(db, `rooms/${currentRoomId}/gameState`), newState).catch(() => {});
 }
 
-// =========================================
-// منطق ساخت جدول و حرکت
-// =========================================
 function createBoard() {
     board.innerHTML = ''; 
     for (let r = 0; r < gridSize; r++) {
         for (let c = 0; c < gridSize; c++) {
             const div = document.createElement('div');
-            div.dataset.row = r;
-            div.dataset.col = c;
-
+            div.dataset.row = r; div.dataset.col = c;
             if (r % 2 === 0 && c % 2 === 0) {
                 div.className = 'cell';
                 div.addEventListener('click', () => handleCellClick(r, c));
-                
                 if (gameMode === 'offline') {
-                    if (r === positions.red.r && c === positions.red.c) {
-                        div.innerHTML = '<div class="pawn red" id="pawn-red"></div>';
-                    } else if (r === positions.blue.r && c === positions.blue.c) {
-                        div.innerHTML = '<div class="pawn blue" id="pawn-blue"></div>';
-                    }
+                    if (r === positions.red.r && c === positions.red.c) div.innerHTML = '<div class="pawn red" id="pawn-red"></div>';
+                    else if (r === positions.blue.r && c === positions.blue.c) div.innerHTML = '<div class="pawn blue" id="pawn-blue"></div>';
                 }
-            } else if (r % 2 === 0 && c % 2 !== 0) {
-                div.className = 'wall-v';
-            } else if (r % 2 !== 0 && c % 2 === 0) {
-                div.className = 'wall-h';
-            } else {
-                div.className = 'cross'; 
-            }
+            } else if (r % 2 === 0 && c % 2 !== 0) div.className = 'wall-v';
+            else if (r % 2 !== 0 && c % 2 === 0) div.className = 'wall-h';
+            else div.className = 'cross'; 
             board.appendChild(div);
         }
     }
@@ -362,32 +357,20 @@ function handleCellClick(r, c) {
 
     if (gameMode === 'offline') {
         movePawn(currentPlayer, r, c);
-        
         if (checkWin(currentPlayer, r)) {
-            isGameOver = true;
-            scores[currentPlayer]++; 
-            updateDisplay();
-            
+            isGameOver = true; scores[currentPlayer]++; updateDisplay();
             const winnerName = currentPlayer === 'blue' ? player1Name : player2Name;
             document.getElementById('turn-indicator').innerText = `🏆 برنده: ${winnerName} 🏆`;
             document.getElementById('turn-indicator').className = currentPlayer === 'blue' ? 'turn-indicator blue-turn' : 'turn-indicator red-turn';
-            clearMoveHints(); 
-            document.getElementById('restart-btn').classList.remove('hidden');
+            clearMoveHints(); document.getElementById('restart-btn').classList.remove('hidden');
             setTimeout(() => { alert(`تبریک! ${winnerName} برنده شد! 🎉`); }, 50);
             return;
-        } else {
-            currentPlayer = opponent;
-        }
+        } else currentPlayer = opponent;
         updateDisplay();
     } else {
         positions[currentPlayer] = { r: r, c: c };
-        
-        if (checkWin(currentPlayer, r)) {
-            isGameOver = true;
-            scores[currentPlayer]++; 
-        } else {
-            currentPlayer = opponent;
-        }
+        if (checkWin(currentPlayer, r)) { isGameOver = true; scores[currentPlayer]++; } 
+        else currentPlayer = opponent;
         syncGameStateToFirebase();
     }
 }
@@ -395,15 +378,12 @@ function handleCellClick(r, c) {
 function movePawn(player, newR, newC) {
     const oldCell = document.querySelector(`[data-row="${positions[player].r}"][data-col="${positions[player].c}"]`);
     if(oldCell) oldCell.innerHTML = '';
-    
     positions[player] = { r: newR, c: newC };
     const newCell = document.querySelector(`[data-row="${newR}"][data-col="${newC}"]`);
     if(newCell) newCell.innerHTML = `<div class="pawn ${player}" id="pawn-${player}"></div>`;
 }
 
-function checkWin(player, r) {
-    return (player === 'blue' && r === 0) || (player === 'red' && r === 16);
-}
+function checkWin(player, r) { return (player === 'blue' && r === 0) || (player === 'red' && r === 16); }
 
 function updateDisplay() {
     document.querySelector('.red-player').style.opacity = currentPlayer === 'red' ? '1' : '0.4';
@@ -427,20 +407,11 @@ function updateDisplay() {
         }
     }
 
-    if (gameMode === 'offline') {
-        if (!isGameOver) showMoveHints();
-    } else {
-        if (currentPlayer === myRole && !isGameOver) {
-            showMoveHints();
-        } else {
-            clearMoveHints();
-        }
-    }
+    if (gameMode === 'offline') { if (!isGameOver) showMoveHints(); } 
+    else { if (currentPlayer === myRole && !isGameOver) showMoveHints(); else clearMoveHints(); }
 }
 
-function clearMoveHints() {
-    document.querySelectorAll('.move-hint').forEach(h => h.remove());
-}
+function clearMoveHints() { document.querySelectorAll('.move-hint').forEach(h => h.remove()); }
 
 function showMoveHints() {
     clearMoveHints();
@@ -540,30 +511,21 @@ function getWallPartsFromCross(crossElem, type) {
     let r = parseInt(crossElem.dataset.row); let c = parseInt(crossElem.dataset.col);
     let parts = [];
     if (type === 'h') {
-        parts.push(document.querySelector(`[data-row="${r}"][data-col="${c - 1}"]`)); 
-        parts.push(crossElem);     
-        parts.push(document.querySelector(`[data-row="${r}"][data-col="${c + 1}"]`)); 
+        parts.push(document.querySelector(`[data-row="${r}"][data-col="${c - 1}"]`)); parts.push(crossElem); parts.push(document.querySelector(`[data-row="${r}"][data-col="${c + 1}"]`)); 
     } else if (type === 'v') {
-        parts.push(document.querySelector(`[data-row="${r - 1}"][data-col="${c}"]`)); 
-        parts.push(crossElem);     
-        parts.push(document.querySelector(`[data-row="${r + 1}"][data-col="${c}"]`)); 
+        parts.push(document.querySelector(`[data-row="${r - 1}"][data-col="${c}"]`)); parts.push(crossElem); parts.push(document.querySelector(`[data-row="${r + 1}"][data-col="${c}"]`)); 
     }
     return (parts.length === 3 && parts[0] && parts[1] && parts[2]) ? parts : null;
 }
 
-let draggedWallType = null;
-let dragGhost = null;
-let currentPreviewParts = []; 
-let magneticTargets = []; 
-let snappedTarget = null; 
+let draggedWallType = null; let dragGhost = null; let currentPreviewParts = []; let magneticTargets = []; let snappedTarget = null; 
 
 function setupDragAndDrop() {
     const dispensers = document.querySelectorAll('.draggable-wall');
     dispensers.forEach(disp => disp.addEventListener('pointerdown', handleDragStart));
     
     document.getElementById('restart-btn').addEventListener('click', () => {
-        if (gameMode === 'offline') resetOfflineGame();
-        else resetGameToFirebase();
+        if (gameMode === 'offline') resetOfflineGame(); else resetGameToFirebase();
     });
 }
 
@@ -571,9 +533,7 @@ function handleDragStart(e) {
     if (isGameOver || walls[currentPlayer] <= 0) return;
     if (gameMode === 'online' && currentPlayer !== myRole) return;
     
-    draggedWallType = e.target.dataset.type;
-    snappedTarget = null;
-    magneticTargets = [];
+    draggedWallType = e.target.dataset.type; snappedTarget = null; magneticTargets = [];
     document.querySelectorAll('.cross').forEach(cross => {
         const rect = cross.getBoundingClientRect();
         magneticTargets.push({ element: cross, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
@@ -589,11 +549,7 @@ function handleDragStart(e) {
 }
 
 function handleDragMove(e) {
-    if (!dragGhost) return;
-    e.preventDefault();
-    clearPreview();
-    snappedTarget = null;
-
+    if (!dragGhost) return; e.preventDefault(); clearPreview(); snappedTarget = null;
     let closestCross = null; let minDistance = Infinity;
     for (let target of magneticTargets) {
         const dx = e.clientX - target.x; const dy = e.clientY - target.y;
@@ -605,32 +561,18 @@ function handleDragMove(e) {
         moveGhost(closestCross.x, closestCross.y);
         const wallParts = getWallPartsFromCross(closestCross.element, draggedWallType);
         if (wallParts && !wallParts.some(p => p && p.classList.contains('placed-wall'))) {
-            snappedTarget = closestCross.element;
-            showPreview(wallParts);
+            snappedTarget = closestCross.element; showPreview(wallParts);
         }
-    } else {
-        moveGhost(e.clientX, e.clientY);
-    }
+    } else moveGhost(e.clientX, e.clientY);
 }
 
 function moveGhost(x, y) { dragGhost.style.left = x + 'px'; dragGhost.style.top = y + 'px'; }
-
-function showPreview(parts) {
-    const previewClass = currentPlayer === 'red' ? 'preview-red' : 'preview-blue';
-    parts.forEach(p => { if (p) { p.classList.add('preview-wall', previewClass); currentPreviewParts.push(p); } });
-}
-
-function clearPreview() {
-    currentPreviewParts.forEach(p => p.classList.remove('preview-wall', 'preview-red', 'preview-blue'));
-    currentPreviewParts = [];
-}
+function showPreview(parts) { const previewClass = currentPlayer === 'red' ? 'preview-red' : 'preview-blue'; parts.forEach(p => { if (p) { p.classList.add('preview-wall', previewClass); currentPreviewParts.push(p); } }); }
+function clearPreview() { currentPreviewParts.forEach(p => p.classList.remove('preview-wall', 'preview-red', 'preview-blue')); currentPreviewParts = []; }
 
 function handleDragEnd(e) {
-    document.removeEventListener('pointermove', handleDragMove);
-    document.removeEventListener('pointerup', handleDragEnd);
-    if (!dragGhost) return;
-    dragGhost.remove(); dragGhost = null;
-    clearPreview();
+    document.removeEventListener('pointermove', handleDragMove); document.removeEventListener('pointerup', handleDragEnd);
+    if (!dragGhost) return; dragGhost.remove(); dragGhost = null; clearPreview();
     
     if (snappedTarget) {
         const wallParts = getWallPartsFromCross(snappedTarget, draggedWallType);
@@ -649,28 +591,23 @@ function handleWallDropByParts(wallParts) {
     
     if (!hasPath('red') || !hasPath('blue')) {
         wallParts.forEach(p => p.classList.remove('placed-wall', playerColorClass));
-        alert('خطای استراتژی: مسدود کردن کامل مسیر ممنوع است!');
-        return; 
+        alert('خطای استراتژی: مسدود کردن مسیر کاملا ممنوع است!'); return; 
     }
     
-    walls[currentPlayer]--;
-    currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
+    walls[currentPlayer]--; currentPlayer = currentPlayer === 'blue' ? 'red' : 'blue';
     gameMode === 'offline' ? updateDisplay() : syncGameStateToFirebase();
 }
 
 function resetOfflineGame() {
-    startingPlayer = startingPlayer === 'blue' ? 'red' : 'blue';
-    currentPlayer = startingPlayer;
+    startingPlayer = startingPlayer === 'blue' ? 'red' : 'blue'; currentPlayer = startingPlayer;
     isGameOver = false; statsUpdated = false;
-    positions = { red: { r: 0, c: 8 }, blue: { r: 16, c: 8 } };
-    walls = { red: 10, blue: 10 };
+    positions = { red: { r: 0, c: 8 }, blue: { r: 16, c: 8 } }; walls = { red: 10, blue: 10 };
     document.getElementById('restart-btn').classList.add('hidden');
     createBoard(); updateDisplay();
 }
 
 function resetGameToFirebase() {
-    if (myRole !== 'blue') { alert("فقط سازنده اتاق می‌تواند دست جدید را شروع کند."); return; }
-
+    // در این نسخه جدید هر کس دکمه رو بزنه میتونه بازی رو ریست کنه
     const nextStarter = startingPlayer === 'blue' ? 'red' : 'blue';
     statsUpdated = false;
 
