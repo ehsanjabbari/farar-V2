@@ -14,13 +14,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// متغیرهای شبکه و پروفایل
 let loggedInUser = null; 
 let gameMode = 'online'; 
 let myRole = null; 
 let currentRoomId = null;
 
-// متغیرهای بازی
 const board = document.getElementById('board');
 const gridSize = 17;
 let player1Name = 'PLAYER 1';
@@ -28,8 +26,8 @@ let player2Name = 'PLAYER 2';
 let startingPlayer = 'blue';
 let currentPlayer = 'blue';
 let isGameOver = false;
-let statsUpdated = false; // جلوگیری از دوبار شمرده شدن برد/باخت
-let scores = { red: 0, blue: 0 }; // نتایج اتاق فعلی
+let statsUpdated = false; 
+let scores = { red: 0, blue: 0 }; 
 
 let positions = { red: { r: 0, c: 8 }, blue: { r: 16, c: 8 } };
 let walls = { red: 10, blue: 10 };
@@ -38,6 +36,19 @@ const withTimeout = (promise, ms = 5000) => {
     const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('NetworkTimeout')), ms));
     return Promise.race([promise, timeout]);
 };
+
+// =========================================
+// کنترل جابجایی بین صفحات (لابی و ورود)
+// =========================================
+document.getElementById('btn-show-login').addEventListener('click', () => {
+    document.getElementById('lobby-screen').classList.add('hidden');
+    document.getElementById('auth-screen').classList.remove('hidden');
+});
+
+document.getElementById('btn-cancel-login').addEventListener('click', () => {
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('lobby-screen').classList.remove('hidden');
+});
 
 // =========================================
 // سیستم ثبت نام و ورود (Authentication)
@@ -63,29 +74,35 @@ document.getElementById('btn-login').addEventListener('click', async () => {
             const userData = snapshot.val();
             if (userData.password === password) {
                 loggedInUser = { username, ...userData };
-                showLobby();
+                processLoginSuccess();
             } else {
                 alert("رمز عبور برای این نام کاربری اشتباه است!");
             }
         } else {
-            // ساخت حساب جدید
             const newUser = { password, wins: 0, losses: 0 };
             await set(userRef, newUser);
             loggedInUser = { username, ...newUser };
             alert("حساب جدید شما با موفقیت ساخته شد!");
-            showLobby();
+            processLoginSuccess();
         }
     } catch (e) {
         alert("ارتباط با سرور برقرار نشد. لطفاً VPN خود را بررسی کنید.");
     } finally {
-        btn.innerText = 'ورود / ساخت حساب جدید';
+        btn.innerText = 'تایید و ورود';
         btn.disabled = false;
     }
 });
 
-function showLobby() {
+function processLoginSuccess() {
+    // بازگشت به لابی
     document.getElementById('auth-screen').classList.add('hidden');
     document.getElementById('lobby-screen').classList.remove('hidden');
+    
+    // مخفی کردن دکمه ورود و نمایش کارت پروفایل
+    document.getElementById('btn-show-login').classList.add('hidden');
+    document.getElementById('login-divider').classList.add('hidden');
+    document.getElementById('profile-section').classList.remove('hidden');
+    
     updateProfileUI();
 }
 
@@ -99,6 +116,11 @@ function updateProfileUI() {
 // سیستم لابی اتاق‌ها
 // =========================================
 document.getElementById('btn-create-room').addEventListener('click', async () => {
+    if (!loggedInUser) {
+        alert("برای بازی آنلاین ابتدا باید وارد حساب کاربری شوید!");
+        return;
+    }
+
     const btn = document.getElementById('btn-create-room');
     btn.innerText = 'در حال ساخت...';
     btn.disabled = true;
@@ -136,6 +158,11 @@ document.getElementById('btn-create-room').addEventListener('click', async () =>
 });
 
 document.getElementById('btn-join-room').addEventListener('click', async () => {
+    if (!loggedInUser) {
+        alert("برای بازی آنلاین ابتدا باید وارد حساب کاربری شوید!");
+        return;
+    }
+
     const code = document.getElementById('input-room-code').value.trim().toUpperCase();
     if (!code) return;
 
@@ -153,7 +180,6 @@ document.getElementById('btn-join-room').addEventListener('click', async () => {
             myRole = 'red'; 
             statsUpdated = false;
             
-            // ثبت نام ما به عنوان بازیکن دوم در دیتابیس
             await set(ref(db, `rooms/${code}/gameState/player2Name`), loggedInUser.username);
             setupGameScreen();
         } else {
@@ -171,9 +197,9 @@ document.getElementById('btn-offline-mode').addEventListener('click', () => {
     gameMode = 'offline';
     myRole = 'both'; 
     currentRoomId = null;
-    player1Name = loggedInUser.username;
-    player2Name = 'مهمان (آفلاین)';
-    statsUpdated = true; // در حالت آفلاین آمار پروفایل ثبت نمی‌شود
+    player1Name = loggedInUser ? loggedInUser.username : 'مهمان ۱';
+    player2Name = 'مهمان ۲';
+    statsUpdated = true; 
 
     startingPlayer = 'blue';
     currentPlayer = 'blue';
@@ -214,8 +240,8 @@ function setupGameScreen() {
 // آپدیت پروفایل در دیتابیس هنگام پایان بازی
 // =========================================
 function processGameOver(winnerRole) {
-    if (gameMode === 'online' && !statsUpdated) {
-        statsUpdated = true; // جلوگیری از دوبار ثبت شدن
+    if (gameMode === 'online' && !statsUpdated && loggedInUser) {
+        statsUpdated = true; 
         
         if (myRole === winnerRole) {
             loggedInUser.wins++;
@@ -225,7 +251,7 @@ function processGameOver(winnerRole) {
             set(ref(db, `users/${loggedInUser.username}/losses`), loggedInUser.losses);
         }
         
-        updateProfileUI(); // آپدیت اعداد در لابی پنهان
+        updateProfileUI(); 
     }
 }
 
@@ -383,10 +409,8 @@ function updateDisplay() {
     document.querySelector('.red-player').style.opacity = currentPlayer === 'red' ? '1' : '0.4';
     document.querySelector('.blue-player').style.opacity = currentPlayer === 'blue' ? '1' : '0.4';
     
-    // آپدیت نام‌ها
     document.getElementById('name-blue').innerText = player1Name;
     document.getElementById('name-red').innerText = player2Name;
-
     document.getElementById('red-walls').innerText = walls.red;
     document.getElementById('blue-walls').innerText = walls.blue;
     document.getElementById('score-red').innerText = scores.red;

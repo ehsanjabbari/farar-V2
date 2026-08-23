@@ -14,7 +14,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 25px;
+    gap: 20px;
     width: 100%;
     max-width: 350px;
 }
@@ -38,7 +38,6 @@ body {
     box-sizing: border-box;
 }
 
-/* استایل پروفایل */
 .profile-card {
     background: linear-gradient(135deg, #1d3557, #2a4c7a);
     color: white;
@@ -100,25 +99,17 @@ body {
     width: 100%;
 }
 
-.primary-btn {
-    background-color: #1d3557;
-    color: white;
-    box-shadow: 0 4px 15px rgba(29, 53, 87, 0.2);
-}
+.primary-btn { background-color: #1d3557; color: white; box-shadow: 0 4px 15px rgba(29, 53, 87, 0.2); }
 .primary-btn:hover { background-color: #14243b; transform: translateY(-2px); }
 
-.secondary-btn {
-    background-color: #e63946;
-    color: white;
-    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.2);
-}
+.secondary-btn { background-color: #e63946; color: white; box-shadow: 0 4px 15px rgba(230, 57, 70, 0.2); }
 .secondary-btn:hover { background-color: #c92a36; transform: translateY(-2px); }
 
-.outline-btn {
-    background-color: transparent;
-    color: #495057;
-    border: 2px solid #ced4da;
-}
+/* دکمه سبز رنگ ورود */
+.success-btn { background-color: #2a9d8f; color: white; box-shadow: 0 4px 15px rgba(42, 157, 143, 0.2); }
+.success-btn:hover { background-color: #21867a; transform: translateY(-2px); }
+
+.outline-btn { background-color: transparent; color: #495057; border: 2px solid #ced4da; }
 .outline-btn:hover { background-color: #f8f9fa; transform: translateY(-2px); }
 
 input[type="text"], input[type="password"] {

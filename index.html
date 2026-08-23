@@ -13,25 +13,12 @@
 </head>
 <body>
 
-    <!-- 1. صفحه ورود / ثبت نام -->
-    <div id="auth-screen" class="lobby-wrapper">
-        <h1 class="game-title">فرار از دیوار</h1>
-        <div class="lobby-card">
-            <h3 style="text-align: center; margin-top: 0; color: #1d3557;">ورود به حساب کاربری</h3>
-            <input type="text" id="input-username" placeholder="نام کاربری (حداقل 3 حرف)" autocomplete="off">
-            <input type="password" id="input-password" placeholder="رمز عبور (حداقل 4 کاراکتر)" autocomplete="off">
-            <button id="btn-login" class="btn primary-btn">ورود / ساخت حساب جدید</button>
-            <p class="auth-hint">اگر حسابی با این نام وجود نداشته باشد، به صورت خودکار برای شما ساخته می‌شود.<br><br>⚠️ لطفاً از رمزهای مهم و بانکی خود استفاده نکنید.</p>
-        </div>
-        <div class="creator-signature">Created by EhsanJabbari</div>
-    </div>
-
-    <!-- 2. صفحه لابی -->
-    <div id="lobby-screen" class="lobby-wrapper hidden">
+    <!-- 1. صفحه لابی (صفحه اصلی) -->
+    <div id="lobby-screen" class="lobby-wrapper">
         <h1 class="game-title">فرار از دیوار</h1>
         
-        <!-- کارت پروفایل کاربر -->
-        <div class="profile-card">
+        <!-- کارت پروفایل (در ابتدا مخفی است) -->
+        <div id="profile-section" class="profile-card hidden">
             <div id="profile-name" class="profile-name">سلام، کاربر</div>
             <div class="profile-stats">
                 <span class="stat-win">🏆 کل بردها: <b id="profile-wins">0</b></span>
@@ -40,6 +27,10 @@
         </div>
 
         <div class="lobby-card">
+            <!-- دکمه ورود به حساب کاربری -->
+            <button id="btn-show-login" class="btn success-btn">👤 ورود یا ساخت حساب</button>
+            <div id="login-divider" class="divider"><span>سپس</span></div>
+
             <button id="btn-create-room" class="btn primary-btn">ساخت اتاق جدید</button>
             <div class="divider"><span>یا</span></div>
             <input type="text" id="input-room-code" placeholder="کد 4 رقمی اتاق را وارد کنید..." autocomplete="off">
@@ -51,7 +42,23 @@
         <div class="creator-signature">Created by EhsanJabbari</div>
     </div>
 
-    <!-- 3. صفحه اصلی بازی -->
+    <!-- 2. صفحه ورود / ثبت نام (در ابتدا مخفی است) -->
+    <div id="auth-screen" class="lobby-wrapper hidden">
+        <h1 class="game-title">فرار از دیوار</h1>
+        <div class="lobby-card">
+            <h3 style="text-align: center; margin-top: 0; color: #1d3557;">ورود به حساب کاربری</h3>
+            <input type="text" id="input-username" placeholder="نام کاربری (حداقل 3 حرف)" autocomplete="off">
+            <input type="password" id="input-password" placeholder="رمز عبور (حداقل 4 کاراکتر)" autocomplete="off">
+            
+            <button id="btn-login" class="btn primary-btn">تایید و ورود</button>
+            <button id="btn-cancel-login" class="btn outline-btn">بازگشت به لابی</button>
+            
+            <p class="auth-hint">اگر حسابی با این نام وجود نداشته باشد، به صورت خودکار برای شما ساخته می‌شود.</p>
+        </div>
+        <div class="creator-signature">Created by EhsanJabbari</div>
+    </div>
+
+    <!-- 3. صفحه اصلی بازی (در ابتدا مخفی است) -->
     <div id="game-screen" class="game-wrapper hidden">
         
         <div class="room-info">
