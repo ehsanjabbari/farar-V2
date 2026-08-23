@@ -38,6 +38,17 @@ const withTimeout = (promise, ms = 5000) => {
 };
 
 // =========================================
+// قفل کردن اسکرول مزاحم در مرورگر موبایل
+// =========================================
+document.addEventListener('touchmove', function(e) {
+    // اگر در صفحه بازی هستیم یا کاربر جای غیر از لیست دوستان را می‌کشد، اسکرول قفل شود
+    if (!document.getElementById('game-screen').classList.contains('hidden') || 
+        !e.target.closest('#friends-list')) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
+// =========================================
 // جابجایی صفحات
 // =========================================
 document.getElementById('btn-show-login').addEventListener('click', () => {
@@ -49,7 +60,7 @@ document.getElementById('btn-cancel-login').addEventListener('click', () => {
     document.getElementById('main-lobby').classList.remove('hidden');
 });
 document.getElementById('btn-back-dashboard').addEventListener('click', () => {
-    location.reload(); // ساده‌ترین راه برای بازگشت و ریست بازی
+    location.reload(); 
 });
 document.getElementById('btn-offline-guest').addEventListener('click', () => startOfflineGame());
 document.getElementById('btn-offline-mode').addEventListener('click', () => startOfflineGame());
@@ -100,7 +111,6 @@ function processLoginSuccess() {
     document.getElementById('dashboard-screen').classList.remove('hidden');
     updateProfileUI();
 
-    // گوش دادن به تغییرات لیست دوستان
     const friendsRef = ref(db, `users/${loggedInUser.username}/friends`);
     onValue(friendsRef, (snapshot) => {
         renderFriendsList(snapshot.val());
@@ -127,7 +137,6 @@ document.getElementById('btn-add-friend').addEventListener('click', async () => 
     try {
         const snap = await withTimeout(get(ref(db, `users/${friendName}`)));
         if (snap.exists()) {
-            // دوستی دوطرفه
             await set(ref(db, `users/${loggedInUser.username}/friends/${friendName}`), true);
             await set(ref(db, `users/${friendName}/friends/${loggedInUser.username}`), true);
             document.getElementById('input-friend-name').value = '';
@@ -160,7 +169,6 @@ function renderFriendsList(friendsObj) {
         const btn = document.createElement('button');
         btn.className = 'btn success-btn btn-small';
         btn.innerText = 'شروع بازی';
-        // با زدن دکمه مستقیما با او بازی میکنیم
         btn.onclick = () => startGameWithFriend(friendName);
         
         div.appendChild(span);
@@ -174,7 +182,6 @@ function renderFriendsList(friendsObj) {
 // =========================================
 async function startGameWithFriend(friendName) {
     gameMode = 'online';
-    // ساخت آیدی اتاق یکتا و مشترک بر اساس نام دو نفر به ترتیب حروف الفبا
     currentRoomId = [loggedInUser.username, friendName].sort().join('_');
     statsUpdated = false;
 
@@ -183,7 +190,6 @@ async function startGameWithFriend(friendName) {
 
     if (snapshot && snapshot.exists()) {
         const state = snapshot.val();
-        // اگر اتاق قبلا ساخته شده، تعیین نقش بر اساس نام ثبت شده در دیتابیس
         if (state.player1Name === loggedInUser.username) {
             myRole = 'blue';
             player1Name = state.player1Name;
@@ -194,7 +200,6 @@ async function startGameWithFriend(friendName) {
             player2Name = state.player2Name;
         }
     } else {
-        // اگر اتاق وجود ندارد، ما آن را می‌سازیم و نفر اول میشویم
         myRole = 'blue';
         player1Name = loggedInUser.username;
         player2Name = friendName;
@@ -607,7 +612,6 @@ function resetOfflineGame() {
 }
 
 function resetGameToFirebase() {
-    // در این نسخه جدید هر کس دکمه رو بزنه میتونه بازی رو ریست کنه
     const nextStarter = startingPlayer === 'blue' ? 'red' : 'blue';
     statsUpdated = false;
 

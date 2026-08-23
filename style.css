@@ -2,7 +2,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    /* تنظیم ارتفاع دقیق برای موبایل و قفل کردن اسکرول */
     min-height: 100vh;
+    height: 100dvh; 
+    overflow: hidden; 
+    overscroll-behavior: none; /* جلوگیری از رفرش شدن صفحه با کشیدن به پایین */
     background-color: #f8f9fa; 
     font-family: 'Segoe UI', Tahoma, sans-serif; 
     margin: 0;
@@ -73,6 +77,8 @@ body {
     border-radius: 12px;
     padding: 5px 10px;
     background: #fafbfc;
+    /* اجازه اسکرول فقط در لیست دوستان */
+    touch-action: pan-y;
 }
 .friend-item {
     display: flex;
@@ -119,7 +125,15 @@ input:focus { border-color: #1d3557; }
 .role-badge { background: #1d3557; color: white; padding: 4px 10px; border-radius: 8px; font-size: 12px; }
 .role-badge.red-role { background: #e63946; }
 
-.game-wrapper { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%; max-width: 400px; }
+.game-wrapper { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 15px; 
+    width: 100%; 
+    max-width: 400px; 
+    touch-action: none; /* قفل کردن کامل لمس و اسکرول در محیط بازی */
+}
 
 .scoreboard { display: flex; justify-content: space-between; width: 100%; font-weight: bold; font-size: 14px; padding: 0 5px; box-sizing: border-box; gap: 10px; }
 .player { padding: 10px; border-radius: 14px; color: #ffffff; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: opacity 0.3s; width: 48%; box-sizing: border-box; }
@@ -139,7 +153,7 @@ input:focus { border-color: #1d3557; }
 .ghost-wall.h { width: 80px; height: 8px; }
 .ghost-wall.v { width: 8px; height: 80px; }
 
-.board { display: grid; width: 100%; aspect-ratio: 1 / 1; grid-template-columns: 1fr repeat(8, 8px 1fr); grid-template-rows: 1fr repeat(8, 8px 1fr); background-color: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05); box-sizing: border-box; }
+.board { display: grid; width: 100%; aspect-ratio: 1 / 1; grid-template-columns: 1fr repeat(8, 8px 1fr); grid-template-rows: 1fr repeat(8, 8px 1fr); background-color: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05); box-sizing: border-box; touch-action: none; }
 .cell { background-color: #f8f9fa; border-radius: 4px; position: relative; cursor: pointer; }
 .wall-v, .wall-h, .cross { background-color: #f1f3f5; transition: background-color 0.3s; }
 .placed-wall { cursor: not-allowed; }
