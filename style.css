@@ -1,6 +1,7 @@
 body {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start; /* تغییر به فلکس‌استارت تا المان‌ها از بالا چیده شوند */
     align-items: center;
     min-height: 100vh;
     height: 100dvh; 
@@ -9,7 +10,8 @@ body {
     background-color: #f8f9fa; 
     font-family: 'Segoe UI', Tahoma, sans-serif; 
     margin: 0;
-    padding: 10px; /* کاهش پدینگ کلی صفحه */
+    /* فاصله هوشمند از بالا: فضای خالی ناچ آیفون + 30 پیکسل فاصله اضافه به سمت پایین */
+    padding: calc(env(safe-area-inset-top, 20px) + 30px) 10px 10px 10px; 
     box-sizing: border-box;
 }
 
@@ -17,13 +19,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px; /* کاهش فاصله بین کارت‌ها */
+    gap: 12px; 
     width: 100%;
     max-width: 350px;
 }
 
 .game-title {
-    font-size: 24px; /* کوچکتر شدن تایتل بازی */
+    font-size: 24px; 
     color: #1d3557;
     margin: 0;
     text-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -31,13 +33,13 @@ body {
 
 .lobby-card {
     background: #ffffff;
-    padding: 15px; /* کاهش پدینگ کارت لابی */
+    padding: 15px; 
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.06);
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* کاهش فاصله بین دکمه‌ها */
+    gap: 10px; 
     box-sizing: border-box;
 }
 
@@ -65,12 +67,11 @@ body {
 .divider::before { content: ""; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #e9ecef; z-index: 1; }
 .divider span { background: #fff; padding: 0 10px; color: #adb5bd; font-size: 12px; position: relative; z-index: 2; }
 
-/* استایل‌های لیست دوستان */
 .add-friend-box { display: flex; gap: 8px; }
 .add-friend-box input { flex: 1; padding: 8px; font-size: 12px; }
 
 .friends-container {
-    max-height: 120px; /* ارتفاع کمتر برای لیست دوستان */
+    max-height: 120px; 
     overflow-y: auto;
     border: 2px solid #f1f3f5;
     border-radius: 10px;
@@ -91,7 +92,7 @@ body {
 .friend-item:last-child { border-bottom: none; }
 
 .btn {
-    padding: 10px; /* باریک‌تر شدن دکمه‌ها */
+    padding: 10px; 
     border: none; 
     border-radius: 10px; 
     font-size: 13px;
@@ -115,7 +116,7 @@ body {
 .outline-btn:hover { background-color: #f8f9fa; transform: translateY(-2px); }
 
 input[type="text"], input[type="password"] {
-    padding: 10px; /* باریک‌تر شدن اینپوت‌ها */
+    padding: 10px; 
     border: 2px solid #e9ecef; 
     border-radius: 10px;
     font-size: 13px; 
@@ -135,12 +136,11 @@ input:focus { border-color: #1d3557; }
 .role-badge { background: #1d3557; color: white; padding: 3px 8px; border-radius: 6px; font-size: 11px; }
 .role-badge.red-role { background: #e63946; }
 
-/* فشردگی محیط اصلی بازی */
 .game-wrapper { 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    gap: 8px; /* کاهش شدید فاصله‌ها در حین بازی */
+    gap: 8px; 
     width: 100%; 
     max-width: 400px; 
     touch-action: none; 
